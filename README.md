@@ -4,7 +4,7 @@ def obter_dados_item():
     item = input("Descrição do produto: ")
     unidade = input("Unidade (ex: kg, un): ")
     valor = float(input("Valor unitário: "))
-    return {"Codigo do produto": codigo, "Item": item, "Unidade": unidade, "Valor Unitário": valor}
+    return {"Codigo": codigo, "Item": item, "Unidade": unidade, "Valor Unitário": valor}
 
 def adicionar_ao_estoque(estoque_lista, produto):
     """Adiciona um produto à lista de estoque."""
@@ -14,10 +14,10 @@ def adicionar_ao_estoque(estoque_lista, produto):
 def exibir_tabela_estoque(estoque_lista):
     """Exibe todos os produtos cadastrados em formato de tabela."""
     print("\n--- Produtos Cadastrados ---")
-    print(f"{'Item':20} {'Unidade':10} {'Valor Unitário':>15}")
+    print(f"{'Codigo':20} {'Item':20} {'Unidade':10} {'Valor Unitário':>15}")
     print("-" * 50)
     for produto in estoque_lista:
-        print(f"{produto['Item']:20} {produto['Unidade']:10} R$ {produto['Valor Unitário']:>10.2f}")
+        print(f"{produto['Codigo']:20} {produto['Item']:20} {produto['Unidade']:10} R$ {produto['Valor Unitário']:>10.2f}")
 
 # Programa principal
 estoque = []
