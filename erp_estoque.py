@@ -30,7 +30,6 @@ def cadastrar_produto():
     nome = input("Nome do produto: ")
     categoria = input("Categoria: ")
 
-    # validações de número
     while True:
         try:
             preco = float(input("Preço (R$): ").replace(",", "."))
@@ -57,38 +56,44 @@ def cadastrar_produto():
 # Exclusão de produto
 # -----------------------------------------------------
 def excluir_produto():
-    print("\n--- EXCLUSÃO DE PRODUTO ---")
+    conn = sqlite3.connect('estoque.db')
+    cursor = conn.cursor()
 
-    termo = input("Digite o ID ou Nome do produto: ")
+    print("\n--- EXCLUIR PRODUTO ---")
 
-    conexao = sqlite3.connect("estoque.db")
-    cursor = conexao.cursor()
+    entrada = input("Digite o NOME ou ID do produto que deseja excluir: ").strip()
 
-    # verifica se é ID ou nome
-    if termo.isdigit():
-        cursor.execute("SELECT * FROM produtos WHERE id = ?", (termo,))
-    else:
-        cursor.execute("SELECT * FROM produtos WHERE nome = ?", (termo,))
+    cursor.execute("SELECT * FROM produtos WHERE nome = ?", (entrada,))
+    resultados = cursor.fetchall()
 
-    produto = cursor.fetchone()
-
-    if not produto:
-        print("❌ Produto não encontrado.")
-        conexao.close()
+    if resultados:
+        print("\nProduto encontrado:")
+        for r in resultados:
+            print(f"ID: {r[0]} | Nome: {r[1]} | Categoria: {r[2]} | Preço: {r[3]} | Quantidade: {r[4]}")
+        confirmar = input("Deseja excluir ESTE produto? (s/n): ").lower()
+        if confirmar == "s":
+            cursor.execute("DELETE FROM produtos WHERE nome = ?", (entrada,))
+            conn.commit()
+            print("Produto excluído com sucesso!")
+        conn.close()
         return
-
-    print(f"\nEncontrado: ID {produto[0]} | Nome: {produto[1]} | Quantidade: {produto[4]}")
-    confirmar = input("Confirmar exclusão? (S/N): ").lower()
-
-    if confirmar == "s":
-        cursor.execute("DELETE FROM produtos WHERE id = ?", (produto[0],))
-        conexao.commit()
-        print("🗑️ Produto excluído com sucesso!")
+        
+    if entrada.isdigit():
+        cursor.execute("SELECT * FROM produtos WHERE id = ?", (entrada,))
+        item = cursor.fetchone()
+        if item:
+            print(f"\nProduto encontrado: ID {item[0]} - {item[1]}")
+            confirmar = input("Excluir? (s/n): ").lower()
+            if confirmar == "s":
+                cursor.execute("DELETE FROM produtos WHERE id = ?", (entrada,))
+                conn.commit()
+                print("Produto excluído com sucesso!")
+        else:
+            print("Produto não encontrado.")
     else:
-        print("⛔ Exclusão cancelada.")
+        print("Nenhum produto encontrado com esse nome ou ID.")
 
-    conexao.close()
-
+    conn.close()
 
 # -----------------------------------------------------
 # Relatório de produtos
